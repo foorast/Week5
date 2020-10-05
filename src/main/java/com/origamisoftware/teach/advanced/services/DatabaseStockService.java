@@ -10,6 +10,7 @@ import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -32,9 +33,9 @@ public class DatabaseStockService implements StockService {
      */
     @Override
     public StockQuote getQuote(String symbol) throws StockServiceException {
-        // todo - this is a pretty lame implementation why?
         List<StockQuote> stockQuotes = null;
         try {
+
             Connection connection = DatabaseUtils.getConnection();
             Statement statement = connection.createStatement();
             String queryString = "select * from quotes where symbol = '" + symbol + "'";
@@ -69,7 +70,34 @@ public class DatabaseStockService implements StockService {
      * error.
      */
     @Override
-    public List<StockQuote> getQuote(String symbol, Calendar from, Calendar until) {
+    public List<StockQuote> getQuote(String symbol, Calendar from, Calendar until) throws StockServiceException{
+
+        List<StockQuote> sq = null;
+        java.sql.Date startDate = new java.sql.Date(from.getTimeInMillis());
+        java.sql.Date endDate = new java.sql.Date(until.getTimeInMillis());
+        try {
+            Connection connect = DatabaseUtils.getConnection();
+            Statement statement = connect.createStatement();
+
+            String string = "select * from quotes where symbol = '" + symbol + "' and time between '" +startDate + "' and '" + endDate + "'";
+
+            ResultSet resultSet = statement.executeQuery(string);
+            sq = new ArrayList<>(resultSet.getFetchSize());
+            while(resultSet.next()) {
+                String symbolValue = resultSet.getString("symbol");
+                Date time = resultSet.getDate("time");
+                BigDecimal price = resultSet.getBigDecimal("price");
+                if (time.getTime() > startDate.getTime() && time.getTime() < endDate.getTime()){
+                    sq.add(new StockQuote(price, time, symbolValue));
+                }
+            }
+
+        } catch (DatabaseConnectionException | SQLException e){
+            throw new StockServiceException(e.getMessage(), e);
+        }
+        if (sq.isEmpty()){
+            throw new StockServiceException("There is no data for: " + symbol);
+        }
         return null;
     }
 }

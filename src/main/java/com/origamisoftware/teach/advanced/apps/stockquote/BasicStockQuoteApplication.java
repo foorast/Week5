@@ -2,6 +2,7 @@ package com.origamisoftware.teach.advanced.apps.stockquote;
 
 import com.origamisoftware.teach.advanced.model.StockQuery;
 import com.origamisoftware.teach.advanced.model.StockQuote;
+import com.origamisoftware.teach.advanced.services.DatabaseStockService;
 import com.origamisoftware.teach.advanced.services.StockService;
 import com.origamisoftware.teach.advanced.services.StockServiceException;
 import com.origamisoftware.teach.advanced.services.StockServiceFactory;
