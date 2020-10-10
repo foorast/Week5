@@ -9,7 +9,8 @@ import java.util.Properties;
 public class ProgramConfiguration {
 
     public static Properties getApplicationProperties() {
-      return null;
+        return null;
     }
 
 }
+
